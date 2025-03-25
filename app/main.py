@@ -39,9 +39,9 @@ Base.metadata.create_all(bind=engine)
 DEFAULT_PARAMETERS = {
     # Initial values
     "start_date": "2025-04-01",  # April 1, 2025
-    "initial_clients": 0,
-    "initial_developers": 0,
-    "initial_affiliates": 0,
+    "initial_clients": 100,
+    "initial_developers": 50,
+    "initial_affiliates": 20,
     
     # Monthly growth rates
     "client_growth_rates": [0.10, 0.12, 0.15, 0.12, 0.10],  # Monthly growth by year
@@ -83,7 +83,7 @@ def get_growth_rate(month: int, rates: List[float]) -> float:
 # Calculate financial projections based on parameters
 def calculate_projections(params: Dict[str, Any]) -> List[Dict[str, Any]]:
     start_date = datetime.strptime(params["start_date"], "%Y-%m-%d")
-    months = 60  # 5 years projection
+    months = 72
 
     # Initialize values
     clients = params["initial_clients"]
