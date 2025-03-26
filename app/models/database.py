@@ -53,6 +53,7 @@ class Parameters(Base):
     
     # Staff planning
     cto_start_month = Column(Integer)
+    ceo_start_month = Column(Integer)
     sales_start_month = Column(Integer)
     sales_hiring_interval = Column(Integer)
     max_sales_staff = Column(Integer)
@@ -61,6 +62,7 @@ class Parameters(Base):
     
     # Staffing costs
     cto_salary = Column(Float)
+    ceo_salary = Column(Float)
     sales_base_salary = Column(Float)
     sales_commission = Column(Float)
     jr_dev_salary = Column(Float)
@@ -104,10 +106,12 @@ class MonthlyData(Base):
     jr_devs = Column(Integer)
     admin_staff = Column(Integer)
     cto_count = Column(Integer)
+    ceo_count = Column(Integer)
     total_staff = Column(Integer)
     
     # Detailed costs
     cto_cost = Column(Float)
+    ceo_cost = Column(Float)
     sales_cost = Column(Float)
     jr_dev_cost = Column(Float)
     admin_cost = Column(Float)
@@ -141,6 +145,7 @@ class YearlySummary(Base):
     jr_devs = Column(Integer)
     admin_staff = Column(Integer)
     cto_count = Column(Integer)
+    ceo_count = Column(Integer)
     total_staff = Column(Integer)
     
     # Relationship

@@ -55,7 +55,8 @@ DEFAULT_PARAMETERS = {
     "conversion_rate": 0.75,  # Conversion rate after free period
     
     # Staff planning
-    "cto_start_month": 0,  # Partner/CTO from day 1
+    "cto_start_month": 6,
+    "ceo_start_month": 6,
     "sales_start_month": 3,  # First sales person after 3 months
     "sales_hiring_interval": 3,  # New sales person every 3 months
     "max_sales_staff": 10,  # Cap at 10 sales people
@@ -115,6 +116,11 @@ def calculate_projections(params: Dict[str, Any]) -> List[Dict[str, Any]]:
         # CTO hiring
         if i >= params["cto_start_month"] and cto_count == 0:
             cto_count = 1
+        
+        # CEO hiring logic (add after CTO hiring logic)
+        ceo_count = 0
+        if i >= params["ceo_start_month"] and ceo_count == 0:
+            ceo_count = 1
             
         # Sales staff hiring
         if i >= params["sales_start_month"] and i % params["sales_hiring_interval"] == params["sales_start_month"] % params["sales_hiring_interval"] and sales_staff_count < params["max_sales_staff"]:
@@ -187,6 +193,7 @@ def calculate_projections(params: Dict[str, Any]) -> List[Dict[str, Any]]:
         # --- Expense Calculations ---
         # Staff salaries
         cto_cost = cto_count * params["cto_salary"]
+        ceo_cost = ceo_count * params["ceo_salary"]
         jr_dev_cost = jr_dev_count * params["jr_dev_salary"]
         admin_cost = admin_count * params["admin_salary"]
         
@@ -210,6 +217,7 @@ def calculate_projections(params: Dict[str, Any]) -> List[Dict[str, Any]]:
         # Total expenses
         total_expenses = (
             cto_cost + 
+            ceo_cost + 
             jr_dev_cost + 
             admin_cost + 
             sales_total_cost + 
@@ -241,6 +249,9 @@ def calculate_projections(params: Dict[str, Any]) -> List[Dict[str, Any]]:
             "admin_staff": admin_count,
             "cto_count": cto_count,
             "total_staff": sales_staff_count + jr_dev_count + admin_count + cto_count,
+            "ceo_count": ceo_count,
+            "ceo_cost": round(ceo_cost, 2),
+            "total_staff": sales_staff_count + jr_dev_count + admin_count + cto_count + ceo_count,
             # Detailed costs
             "cto_cost": round(cto_cost, 2),
             "sales_cost": round(sales_total_cost, 2),
@@ -250,6 +261,7 @@ def calculate_projections(params: Dict[str, Any]) -> List[Dict[str, Any]]:
             "marketing_cost": round(marketing_cost, 2),
             "affiliate_cost": round(affiliate_program_cost, 2),
             "other_expenses": round(other_expenses, 2),
+
         })
 
     return monthly_data
@@ -355,6 +367,8 @@ def create_default_scenario(db: Session):
         free_months=DEFAULT_PARAMETERS["free_months"],
         conversion_rate=DEFAULT_PARAMETERS["conversion_rate"],
         cto_start_month=DEFAULT_PARAMETERS["cto_start_month"],
+        ceo_start_month=DEFAULT_PARAMETERS["ceo_start_month"],
+        ceo_salary=DEFAULT_PARAMETERS["ceo_salary"],
         sales_start_month=DEFAULT_PARAMETERS["sales_start_month"],
         sales_hiring_interval=DEFAULT_PARAMETERS["sales_hiring_interval"],
         max_sales_staff=DEFAULT_PARAMETERS["max_sales_staff"],
@@ -584,6 +598,8 @@ class ParameterUpdate(BaseModel):
     free_months: Optional[int] = None
     conversion_rate: Optional[float] = None
     cto_start_month: Optional[int] = None
+    ceo_start_month: Optional[int] = None
+    ceo_salary: Optional[float] = None
     sales_start_month: Optional[int] = None
     sales_hiring_interval: Optional[int] = None
     max_sales_staff: Optional[int] = None
@@ -735,6 +751,7 @@ async def get_scenario_yearly_financials(scenario_id: int, db: Session = Depends
             "jr_devs": year.jr_devs,
             "admin_staff": year.admin_staff,
             "cto_count": year.cto_count,
+            "ceo_count": year.ceo_count, 
             "total_staff": year.total_staff
         })
     
